@@ -10,6 +10,7 @@ import numpy as np
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 import random 
+from tqdm import tqdm
 np.random.seed(1)
 
 reload(sys)  
@@ -79,16 +80,63 @@ def kanji_embedding(v, word2vecs, kanji_dict):
     return list(np.mean(out, axis=0))
 
 
-def hybrid_embedding(v, word2vecs, kanji_dict):
-    if v in word2vecs:
-        return list(word2vecs[v])
+def hybrid_embedding(v, ja_w2v, en_w2v, kanji_dict):
+    if v in ja_w2v:
+        return list(ja_w2v[v])
     else:
-        return kanji_embedding(v, word2vecs, kanji_dict)
+        return kanji_embedding(v, en_w2v, kanji_dict)
 
 
+random_out = open('ja.random.embed', 'a')
+w2v_out = open('ja.w2v.embed', 'a')
+kanji_all_out = open('ja.kanji.all.embed', 'a')
+kanji_first_out = open('ja.kanji.first.embed', 'a')
+kanji_singular_out = open('ja.kanji.singular.embed', 'a')
+hybrid_all_out = open('ja.hybrid.all.embed', 'a')
+hybrid_first_out = open('ja.hybrid.first.embed', 'a')
+hybrid_singular_out = open('ja.hybrid.singular.embed', 'a')
 
-
-for v in open(ja_vocab):
+total = sum(1 for _ in open(ja_vocab))
+for v in tqdm(open(ja_vocab), total=total):
     v = v.strip()
-    # TODO -- make and write them all
+
+    e = random_embedding(v)
+    random_out.write(v + ' ' + ' '.join(str(x) for x in e) + '\n')
+
+    e = word2vec_embedding(v, ja_word2vec)
+    w2v_out.write(v + ' ' + ' '.join(str(x) for x in e) + '\n')
+
+    e = kanji_embedding(v, en_word2vec, kanji_all)
+    kanji_all_out.write(v + ' ' + ' '.join(str(x) for x in e) + '\n')
+
+    e = kanji_embedding(v, en_word2vec, kanji_first)
+    kanji_first_out.write(v + ' ' + ' '.join(str(x) for x in e) + '\n')
+
+    e = kanji_embedding(v, en_word2vec, kanji_singular)
+    kanji_singular_out.write(v + ' ' + ' '.join(str(x) for x in e) + '\n')
+
+    e = hybrid_embedding(v, ja_word2vec, en_word2vec, kanji_all)
+    hybrid_all_out.write(v + ' ' + ' '.join(str(x) for x in e) + '\n')
+
+    e = hybrid_embedding(v, ja_word2vec, en_word2vec, kanji_first)
+    hybrid_first_out.write(v + ' ' + ' '.join(str(x) for x in e) + '\n')
+
+    e = hybrid_embedding(v, ja_word2vec, en_word2vec, kanji_singular)
+    hybrid_singular_out.write(v + ' ' + ' '.join(str(x) for x in e) + '\n')
+
+
+
+en_random_out = open('en.random.embed', 'a')
+en_w2v_out = open('en.w2v.embed', 'a')
+
+for v in tqdm(open(en_vocab), total=total):
+    v = v.strip()
+
+    e = random_embedding(v)
+    en_random_out.write(v + ' ' + ' '.join(str(x) for x in e) + '\n')
+
+    e = word2vec_embedding(v, en_word2vec)
+    en_w2v_out.write(v + ' ' + ' '.join(str(x) for x in e) + '\n')
+
     
+
