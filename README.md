@@ -6,7 +6,7 @@ People sometimes initialize vocabs using word vectors in small-to-medium-data Ja
 data/runs are on jagupard10 & 11
 
 Results are
-
+```
 bye random 17.9
 bye w2v 18.3
 bye kanji 18.3
@@ -17,4 +17,4 @@ kytea w2v  19.9
 kytea kanji 20.1
 kytea hybrid 22.0
 
-
+```
